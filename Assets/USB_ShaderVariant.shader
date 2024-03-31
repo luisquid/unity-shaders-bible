@@ -1,29 +1,21 @@
-Shader "Unlit/USB_Simple_Color"
+Shader "Unlit/USB_ShaderVariant"
 {
     Properties
     {
-        // Properties in here
-        _MainTex ("Main TExture", 2D) = "white" {}
-        _Color ("Color", Color) = (1,1,1,1)
-
-        [Toggle] _Enable ("Enable ?", Float) = 1
+        _MainTex ("Main Texture", 2D) = "white"{}
+        [KeywordEnum (Off, Red, Blue)]
+        _Options ("Color Options", Float) = 0
     }
     SubShader
     {
-        // Subshader configuration here
-        Tags { "RenderType"="Opaque" }
-        LOD 100
-
         Pass
         {
             CGPROGRAM
-            // program Cg - HLSL in here
             #pragma vertex vert
             #pragma fragment frag
             // make fog work
             #pragma multi_compile_fog
-
-            #pragma shader_feature _ENABLE_ON
+            #pragma multi_compile _OPTIONS_OFF _OPTIONS_RED _OPTIONS_BLUE
 
             #include "UnityCG.cginc"
 
@@ -42,11 +34,6 @@ Shader "Unlit/USB_Simple_Color"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            float4 _Color;
-
-            float4 ourFunction(){
-                    return float4(1,1,1,1);
-            }
 
             v2f vert (appdata v)
             {
@@ -58,16 +45,16 @@ Shader "Unlit/USB_Simple_Color"
             }
 
             half4 frag (v2f i) : SV_Target
-            {
+            { 
                 half4 col = tex2D(_MainTex, i.uv);
-            
-            #if _ENABLE_ON
-                return col * _Color;
-            #else
-                return col ;
+                
+            #if _OPTIONS_OFF
+                return col;
+            #elif _OPTIONS_RED
+                return col * float4(1,0,0,1);
+            #elif _OPTIONS_BLUE
+                return col * float4(0,0,1,1);
             #endif
-                // float4 f = ourFunction();
-                // return f;
             }
             ENDCG
         }
