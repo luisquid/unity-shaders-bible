@@ -1,24 +1,24 @@
-Shader "USB/USB_ShaderVariant"
+Shader "USB/ReplacementShader"
 {
     Properties
     {
-        _MainTex ("Main Texture", 2D) = "white"{}
-        [KeywordEnum (Off, Red, Blue)]
-        _Options ("Color Options", Float) = 0
+        _MainTex ("Texture", 2D) = "white" {}
         
-        [Enum(Off, 0, Front, 1, Back, 2)]
-        _Face("Face Culling", Float) = 0
+        [Enum(UnityEngine.Rendering.BlendMode)]
+        _SrcBlend("Source Factor", Float) = 1
         
-        [Header(Sliderssss)]
-        [PowerSlider(3.0)]
-        _Brightness ("Brightness", Range(0.01, 1)) = 0.08
-        [Space(10)]
-        [InRange]
-        _Samples ("Samples", Range(0, 255)) = 100
+        [Enum(UnityEngine.Rendering.BlendMode)]
+        _DstBlend("Destination Factor", Float) = 1
     }
     SubShader
     {
-        Cull[_Face]
+        Tags {"Queue" = "Transparent" "RenderType"="Transparent" }
+        Blend [_SrcBlend] [_DstBlend]
+        AlphaToMask On
+        ColorMask RGB
+        
+        LOD 100
+
         Pass
         {
             CGPROGRAM
@@ -26,7 +26,6 @@ Shader "USB/USB_ShaderVariant"
             #pragma fragment frag
             // make fog work
             #pragma multi_compile_fog
-            #pragma multi_compile _OPTIONS_OFF _OPTIONS_RED _OPTIONS_BLUE
 
             #include "UnityCG.cginc"
 
@@ -55,17 +54,12 @@ Shader "USB/USB_ShaderVariant"
                 return o;
             }
 
-            half4 frag (v2f i) : SV_Target
-            { 
-                half4 col = tex2D(_MainTex, i.uv);
-                
-            #if _OPTIONS_OFF
-                return col;
-            #elif _OPTIONS_RED
-                return col * float4(1,0,0,1);
-            #elif _OPTIONS_BLUE
-                return col * float4(0,0,1,1);
-            #endif
+            fixed4 frag (v2f i) : SV_Target
+            {
+                // sample the texture
+                fixed4 col = tex2D(_MainTex, i.uv);
+                fixed4 red = fixed4(1,0,0,1);
+                return col * red;
             }
             ENDCG
         }

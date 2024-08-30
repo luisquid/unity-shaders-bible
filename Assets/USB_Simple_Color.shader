@@ -1,9 +1,9 @@
-Shader "Unlit/USB_Simple_Color"
+Shader "USB/USB_Simple_Color"
 {
     Properties
     {
         // Properties in here
-        _MainTex ("Main TExture", 2D) = "white" {}
+        _MainTex ("Main Texture", 2D) = "white" {}
         _Color ("Color", Color) = (1,1,1,1)
 
         [Toggle] _Enable ("Enable ?", Float) = 1
@@ -11,7 +11,7 @@ Shader "Unlit/USB_Simple_Color"
     SubShader
     {
         // Subshader configuration here
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType"="Opaque"  "Queue" = "Geometry"}
         LOD 100
 
         Pass
@@ -36,7 +36,6 @@ Shader "Unlit/USB_Simple_Color"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
-                UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
             };
 
